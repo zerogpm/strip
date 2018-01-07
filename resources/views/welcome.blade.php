@@ -7,89 +7,43 @@
 
         <title>Laravel</title>
 
-        <!-- Fonts -->
-        <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
-
-        <!-- Styles -->
-        <style>
-            html, body {
-                background-color: #fff;
-                color: #636b6f;
-                font-family: 'Raleway', sans-serif;
-                font-weight: 100;
-                height: 100vh;
-                margin: 0;
-            }
-
-            .full-height {
-                height: 100vh;
-            }
-
-            .flex-center {
-                align-items: center;
-                display: flex;
-                justify-content: center;
-            }
-
-            .position-ref {
-                position: relative;
-            }
-
-            .top-right {
-                position: absolute;
-                right: 10px;
-                top: 18px;
-            }
-
-            .content {
-                text-align: center;
-            }
-
-            .title {
-                font-size: 84px;
-            }
-
-            .links > a {
-                color: #636b6f;
-                padding: 0 25px;
-                font-size: 12px;
-                font-weight: 600;
-                letter-spacing: .1rem;
-                text-decoration: none;
-                text-transform: uppercase;
-            }
-
-            .m-b-md {
-                margin-bottom: 30px;
-            }
-        </style>
     </head>
     <body>
-        <div class="flex-center position-ref full-height">
-            @if (Route::has('login'))
-                <div class="top-right links">
-                    @auth
-                        <a href="{{ url('/home') }}">Home</a>
-                    @else
-                        <a href="{{ route('login') }}">Login</a>
-                        <a href="{{ route('register') }}">Register</a>
-                    @endauth
-                </div>
-            @endif
+        <h1>Buy My Book for $25.00</h1>
 
-            <div class="content">
-                <div class="title m-b-md">
-                    Laravel
-                </div>
+        <form id="checkout-form" action="{{ route('purchases.store') }}" method="POST">
+            {{ csrf_field() }}
 
-                <div class="links">
-                    <a href="https://laravel.com/docs">Documentation</a>
-                    <a href="https://laracasts.com">Laracasts</a>
-                    <a href="https://laravel-news.com">News</a>
-                    <a href="https://forge.laravel.com">Forge</a>
-                    <a href="https://github.com/laravel/laravel">GitHub</a>
-                </div>
-            </div>
-        </div>
+            <input type="hidden" name="stripeToken" id="stripeToken">
+            <input type="hidden" name="stripeEmail" id="stripeEmail">
+
+            <button type="submit">Buy my Book</button>
+        </form>
+
+        <script src="https://checkout.stripe.com/checkout.js"></script>
+
+        <script>
+            let stripe = StripeCheckout.configure({
+              key: "{{ config('services.stripe.key') }}",
+              image: "https://stripe.com/img/documentation/checkout/marketplace.png",
+              locale: "auto",
+              token: function (token) {
+                document.querySelector('#stripeEmail').value = token.email;
+                document.querySelector('#stripeToken').value = token.id;
+                document.querySelector('#checkout-form').submit();
+              }
+            });
+
+            document.querySelector('button').addEventListener('click', function (e) {
+              stripe.open({
+                name: 'My Book',
+                description: 'Some details about the book.',
+                zipCode: true,
+                amount: 2500
+              });
+
+              e.preventDefault();
+            })
+        </script>
     </body>
 </html>

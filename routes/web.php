@@ -14,3 +14,5 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::post('purchases', 'PurchasesController@store')->name('purchases.store');
