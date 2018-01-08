@@ -4,7 +4,8 @@ use Faker\Generator as Faker;
 
 $factory->define(App\Product::class, function (Faker $faker) {
     return [
-        'name' => $faker->name,
-        'price' => 10 + mt_rand() / mt_getrandmax() * (60 - 10),
+        'name'        => $faker->name,
+        'price'       => rand(1000, 8000),
+        'description' => $faker->sentence()
     ];
 });

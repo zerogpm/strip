@@ -42960,26 +42960,24 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
   data: function data() {
     return {
+      stripe: null,
       stripeEmail: '',
       stripeToken: '',
       product: 1
     };
   },
   created: function created() {
+    var self = this;
     this.stripe = StripeCheckout.configure({
       key: keyhash.key,
       image: "https://stripe.com/img/documentation/checkout/marketplace.png",
       locale: "auto",
       token: function token(_token) {
-        this.stripeEmail = _token.email;
-        this.stripeToken = _token.id;
-        var formData = {
-          stripeEmail: this.stripeEmail,
-          stripeToken: this.stripeToken
-        };
-
-        axios.post('/purchases', formData).then(function (response) {
-          return alert('Complete! Thanks for your payment!');
+        self.stripeEmail = _token.email;
+        self.stripeToken = _token.id;
+        axios.post('/purchases', self.$data).then(function (response) {
+          console.log(response);
+          alert('Complete! Thanks for your payment!');
         });
       }
     });
@@ -42993,9 +42991,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
       this.stripe.open({
         name: product.name,
-        description: 'Some details about the book.',
+        description: product.description,
         zipCode: true,
-        amount: product.price * 100
+        amount: product.price
       });
     },
     findProductById: function findProductById(id) {
@@ -43004,7 +43002,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       });
     }
   }
-
 });
 
 /***/ }),
@@ -43092,7 +43089,7 @@ var render = function() {
             "\n            " +
               _vm._s(product.name) +
               " — $" +
-              _vm._s(product.price) +
+              _vm._s(product.price / 100) +
               "\n        "
           )
         ])

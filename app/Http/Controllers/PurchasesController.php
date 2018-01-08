@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Product;
 use Illuminate\Http\Request;
-use Stripe\{Stripe, Charge, Customer};
+use Stripe\{Charge, Customer};
 
 class PurchasesController extends Controller
 {
     public function store(Request $request)
     {
-        Stripe::setApiKey(config('services.stripe.secret'));
+        $product = Product::findOrFail($request->product);
 
         $customer = Customer::create([
             'email'  => $request->stripeEmail,
@@ -18,7 +19,7 @@ class PurchasesController extends Controller
 
         Charge::create([
             'customer' => $customer->id,
-            'amount' => 3500,
+            'amount' => $product->price,
             'currency' => 'cad'
         ]);
 

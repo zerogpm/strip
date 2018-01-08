@@ -6,7 +6,7 @@
 
         <select name="product" v-model="product">
             <option v-for="product in products" :value="product.id">
-                {{ product.name }} &mdash; ${{ product.price}}
+                {{ product.name }} &mdash; ${{ product.price / 100}}
             </option>
         </select>
 
@@ -21,6 +21,7 @@
 
       data() {
         return {
+          stripe: null,
           stripeEmail: '',
           stripeToken: '',
           product: 1
@@ -28,19 +29,19 @@
       },
 
       created() {
+        let self = this;
         this.stripe = StripeCheckout.configure({
           key: keyhash.key,
           image: "https://stripe.com/img/documentation/checkout/marketplace.png",
           locale: "auto",
           token: function (token) {
-            this.stripeEmail = token.email;
-            this.stripeToken = token.id;
-            let formData = {
-              stripeEmail: this.stripeEmail,
-              stripeToken: this.stripeToken
-            };
-
-            axios.post('/purchases', formData).then(response => alert('Complete! Thanks for your payment!'));
+            self.stripeEmail = token.email;
+            self.stripeToken = token.id;
+            axios.post('/purchases', self.$data).then(
+              response => {
+                console.log(response);
+                alert('Complete! Thanks for your payment!')
+              });
           }
         });
       },
@@ -52,16 +53,15 @@
 
           this.stripe.open({
             name: product.name,
-            description: 'Some details about the book.',
+            description: product.description,
             zipCode: true,
-            amount: product.price * 100
+            amount: product.price
           });
         },
 
         findProductById(id) {
           return this.products.find(product => product.id == id);
         }
-      }
-
+      },
     }
 </script>
