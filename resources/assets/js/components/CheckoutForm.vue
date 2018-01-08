@@ -4,6 +4,12 @@
         <input type="hidden" name="stripeToken" v-model="stripeToken">
         <input type="hidden" name="stripeEmail" v-model="stripeEmail">
 
+        <select name="product" v-model="product">
+            <option v-for="product in products" :value="product.id">
+                {{ product.name }} &mdash; ${{ product.price}}
+            </option>
+        </select>
+
         <button type="submit" @click.prevent="buy">Buy my Book</button>
     </form>
 </template>
@@ -11,10 +17,13 @@
 <script>
     export default {
 
+      props: ['products'],
+
       data() {
         return {
           stripeEmail: '',
-          stripeToken: ''
+          stripeToken: '',
+          product: 1
         };
       },
 
@@ -38,12 +47,19 @@
 
       methods: {
         buy() {
+
+          let product = this.findProductById(this.product);
+
           this.stripe.open({
-            name: 'My Book',
+            name: product.name,
             description: 'Some details about the book.',
             zipCode: true,
-            amount: 2500
+            amount: product.price * 100
           });
+        },
+
+        findProductById(id) {
+          return this.products.find(product => product.id == id);
         }
       }
 

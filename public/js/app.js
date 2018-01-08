@@ -42947,12 +42947,22 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
+
+  props: ['products'],
+
   data: function data() {
     return {
       stripeEmail: '',
-      stripeToken: ''
+      stripeToken: '',
+      product: 1
     };
   },
   created: function created() {
@@ -42978,11 +42988,19 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
   methods: {
     buy: function buy() {
+
+      var product = this.findProductById(this.product);
+
       this.stripe.open({
-        name: 'My Book',
+        name: product.name,
         description: 'Some details about the book.',
         zipCode: true,
-        amount: 2500
+        amount: product.price * 100
+      });
+    },
+    findProductById: function findProductById(id) {
+      return this.products.find(function (product) {
+        return product.id == id;
       });
     }
   }
@@ -43039,6 +43057,47 @@ var render = function() {
         }
       }
     }),
+    _vm._v(" "),
+    _c(
+      "select",
+      {
+        directives: [
+          {
+            name: "model",
+            rawName: "v-model",
+            value: _vm.product,
+            expression: "product"
+          }
+        ],
+        attrs: { name: "product" },
+        on: {
+          change: function($event) {
+            var $$selectedVal = Array.prototype.filter
+              .call($event.target.options, function(o) {
+                return o.selected
+              })
+              .map(function(o) {
+                var val = "_value" in o ? o._value : o.value
+                return val
+              })
+            _vm.product = $event.target.multiple
+              ? $$selectedVal
+              : $$selectedVal[0]
+          }
+        }
+      },
+      _vm._l(_vm.products, function(product) {
+        return _c("option", { domProps: { value: product.id } }, [
+          _vm._v(
+            "\n            " +
+              _vm._s(product.name) +
+              " — $" +
+              _vm._s(product.price) +
+              "\n        "
+          )
+        ])
+      })
+    ),
     _vm._v(" "),
     _c(
       "button",
